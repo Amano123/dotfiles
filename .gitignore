@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Claude Code ローカル設定（マシン固有・共有不要）
+.claude/settings.local.json
+
+# Nix ビルド成果物
+result
+result-*
