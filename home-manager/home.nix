@@ -3,6 +3,7 @@
 {
   imports = [
     ./modules/git.nix
+    ./modules/ssh.nix
     ./modules/zsh.nix
     ./modules/vscode.nix
     ./modules/ghostty.nix
