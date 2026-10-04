@@ -40,7 +40,9 @@
     echo "removing Homebrew Cask quarantine attributes..." >&2
     for app in /Applications/*.app; do
       if /usr/bin/xattr -p com.apple.quarantine "$app" 2>/dev/null | /usr/bin/grep -q "Homebrew Cask"; then
-        /usr/bin/xattr -dr com.apple.quarantine "$app"
+        # activate は set -e なので、失敗しても switch 全体を止めない
+        /usr/bin/xattr -dr com.apple.quarantine "$app" \
+          || echo "warning: failed to remove quarantine from $app" >&2
       fi
     done
   '';
