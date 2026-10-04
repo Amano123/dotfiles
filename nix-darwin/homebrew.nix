@@ -4,10 +4,6 @@
   homebrew = {
     enable = true;
 
-    # cask を quarantine せずに入れる（署名・notarize 済み正規アプリ前提）。
-    # これで新規インストールしたアプリの初回起動時 Gatekeeper 警告が出なくなる。
-    caskArgs.no_quarantine = true;
-
     brews = [
       # nixpkgs にない CLI ツールのみここに追加する
       "ollama"
@@ -35,4 +31,17 @@
       cleanup = "none";
     };
   };
+
+  # Homebrew 5.0 で --no-quarantine（caskArgs.no_quarantine）が廃止され効かなくなったため、
+  # brew bundle 実行後に Homebrew Cask 由来の quarantine 属性だけを外す。
+  # onActivation.upgrade で cask が更新されると再付与されるので、毎回の switch で実行する。
+  # （署名・notarize 済み正規アプリ前提。他経路でダウンロードしたアプリには触れない）
+  system.activationScripts.postActivation.text = ''
+    echo "removing Homebrew Cask quarantine attributes..." >&2
+    for app in /Applications/*.app; do
+      if /usr/bin/xattr -p com.apple.quarantine "$app" 2>/dev/null | /usr/bin/grep -q "Homebrew Cask"; then
+        /usr/bin/xattr -dr com.apple.quarantine "$app"
+      fi
+    done
+  '';
 }
